@@ -1,0 +1,231 @@
+{
+  "schema_version": "0.1.0",
+  "project": {
+    "name": "児童関係手当制度 法改正・国会審議一次資料JSON化プロジェクト",
+    "description": "児童手当法、児童扶養手当法、特別児童扶養手当法および関連施行令について、日本法令索引の改正履歴を入口に、審議経過中の趣旨説明・修正趣旨説明・質疑等を国会会議録URLつきで収集し、改正内容と審議論点を構造化する。",
+    "created_at": "2026-04-29",
+    "primary_source_policy": {
+      "use_primary_sources_only": true,
+      "source_systems": [
+        "日本法令索引",
+        "国会会議録検索システム",
+        "衆議院 法律本文・議案情報",
+        "参議院 議案情報",
+        "e-Gov法令検索"
+      ],
+      "do_not_invent": true,
+      "unknown_values": "null",
+      "raw_excerpt_required_for_claims": true,
+      "url_required_for_each_source_event": true,
+      "separate_fact_summary_and_interpretation": true
+    }
+  },
+  "target_laws": [
+    {
+      "target_id": "jidou_teate_hou",
+      "category": "law",
+      "name": "児童手当法",
+      "law_id": "0000061613",
+      "hourei_ndl_url": "https://hourei.ndl.go.jp/#/detail?lawId=0000061613&searchDiv=1&current=5",
+      "short_focus": [
+        "制度創設",
+        "支給対象",
+        "所得制限",
+        "支給額",
+        "子ども・子育て政策との関係"
+      ],
+      "amendments": []
+    },
+    {
+      "target_id": "jidou_fuyou_teate_hou",
+      "category": "law",
+      "name": "児童扶養手当法",
+      "law_id": "0000053349",
+      "hourei_ndl_url": "https://hourei.ndl.go.jp/#/detail?lawId=0000053349&searchDiv=1&current=2",
+      "short_focus": [
+        "制度創設",
+        "母子福祉・ひとり親支援",
+        "所得制限",
+        "一部支給停止",
+        "支給額",
+        "父子家庭への拡大",
+        "公的年金との併給調整"
+      ],
+      "amendments": []
+    },
+    {
+      "target_id": "jidou_fuyou_teate_hou_sekourei",
+      "category": "cabinet_order",
+      "name": "児童扶養手当法施行令",
+      "law_id": "0000053370",
+      "hourei_ndl_url": "https://hourei.ndl.go.jp/#/detail?lawId=0000053370&searchDiv=1&current=22",
+      "short_focus": [
+        "所得制限限度額",
+        "所得計算",
+        "扶養親族等の数",
+        "支給停止",
+        "認定・手続"
+      ],
+      "amendments": []
+    },
+    {
+      "target_id": "tokubetsu_jidou_fuyou_teate_hou",
+      "category": "law",
+      "name": "特別児童扶養手当等の支給に関する法律",
+      "display_name_requested": "特別児童扶養手当法",
+      "law_id": "0000055859",
+      "hourei_ndl_url": "https://hourei.ndl.go.jp/#/detail?lawId=0000055859&searchDiv=1&current=3",
+      "short_focus": [
+        "制度創設",
+        "重度精神薄弱児扶養手当からの展開",
+        "対象児童",
+        "障害程度",
+        "所得制限",
+        "支給額",
+        "障害児福祉手当・特別障害者手当との関係"
+      ],
+      "amendments": []
+    },
+    {
+      "target_id": "tokubetsu_jidou_fuyou_teate_hou_sekourei",
+      "category": "cabinet_order",
+      "name": "特別児童扶養手当等の支給に関する法律施行令",
+      "display_name_requested": "特別児童扶養手当の施行令",
+      "law_id": "0000065214",
+      "hourei_ndl_url": "https://hourei.ndl.go.jp/#/detail?lawId=0000065214&searchDiv=1&current=3",
+      "short_focus": [
+        "所得制限限度額",
+        "所得計算",
+        "障害程度",
+        "支給停止",
+        "認定・手続"
+      ],
+      "amendments": []
+    }
+  ],
+  "amendment_record_template": {
+    "amendment_id": null,
+    "target_id": null,
+    "amendment_label": null,
+    "amendment_law_name": null,
+    "amendment_law_number": null,
+    "amendment_law_id": null,
+    "amendment_hourei_ndl_url": null,
+    "promulgation_date": null,
+    "enforcement_date": null,
+    "deliberation": {
+      "bill_name": null,
+      "diet_session": null,
+      "bill_number": null,
+      "submitter": null,
+      "submitted_date": null,
+      "passed_date": null,
+      "deliberation_hourei_ndl_url": null,
+      "source_events": []
+    },
+    "extracted_change_claims": [],
+    "discussion_points": [],
+    "verification_status": "unverified",
+    "notes": null
+  },
+  "source_event_template": {
+    "source_event_id": null,
+    "target_id": null,
+    "amendment_id": null,
+    "source_type": null,
+    "source_type_allowed_values": [
+      "趣旨説明",
+      "提案理由説明",
+      "衆議院修正部分趣旨説明",
+      "参議院修正部分趣旨説明",
+      "質疑",
+      "討論",
+      "委員長報告",
+      "附帯決議",
+      "その他"
+    ],
+    "purpose": null,
+    "purpose_allowed_values": [
+      "改正内容の把握",
+      "修正内容の把握",
+      "審議論点の把握",
+      "賛否理由の把握",
+      "政府答弁の把握",
+      "今後の課題の把握"
+    ],
+    "source_system": "国会会議録検索システム",
+    "kokkai_ndl_url": null,
+    "simple_txt_url": null,
+    "date": null,
+    "house": null,
+    "meeting_name": null,
+    "meeting_number": null,
+    "speaker": null,
+    "speaker_role": null,
+    "raw_excerpt": null,
+    "normalized_summary": null,
+    "extracted_items": [],
+    "verification_status": "unverified"
+  },
+  "extracted_change_claim_template": {
+    "claim_id": null,
+    "target_id": null,
+    "amendment_id": null,
+    "source_event_id": null,
+    "claim_type": null,
+    "claim_type_allowed_values": [
+      "制度創設",
+      "対象拡大",
+      "対象縮小",
+      "支給額改定",
+      "所得制限改定",
+      "所得算定方法変更",
+      "障害認定基準変更",
+      "併給調整変更",
+      "名称変更",
+      "事務移管",
+      "手続変更",
+      "施行期日",
+      "経過措置",
+      "その他"
+    ],
+    "affected_area": null,
+    "fact_summary": null,
+    "raw_basis_quote": null,
+    "interpretation_note": null,
+    "confidence": "needs_verification"
+  },
+  "discussion_point_template": {
+    "discussion_id": null,
+    "target_id": null,
+    "amendment_id": null,
+    "source_event_id": null,
+    "topic": null,
+    "questioner": null,
+    "respondent": null,
+    "question_summary": null,
+    "answer_summary": null,
+    "raw_basis_quote": null,
+    "policy_issue_tags": [],
+    "importance": "needs_review"
+  },
+  "codex_instructions": {
+    "role": "You are a coding assistant, not a policy analyst.",
+    "tasks": [
+      "For each target_law, open the hourei_ndl_url and collect all amendment records shown in the law history.",
+      "For each amendment, open its amendment law page and collect deliberation history entries.",
+      "For each deliberation entry whose label is 趣旨説明, 提案理由説明, 修正部分趣旨説明, 質疑, 討論, 委員長報告, or 附帯決議, save the kokkai.ndl.go.jp URL as a source_event.",
+      "For 趣旨説明 and 修正部分趣旨説明, extract change claims only when supported by raw_excerpt.",
+      "For 質疑, extract discussion_points. Do not treat every question as a legal change.",
+      "Preserve source URLs and raw excerpts. Do not invent missing values.",
+      "Use null for unavailable values and verification_status='unverified' when not checked."
+    ],
+    "output_files": [
+      "data/allowance_law_manifest.json",
+      "data/amendments.json",
+      "data/source_events.json",
+      "data/extracted_change_claims.json",
+      "data/discussion_points.json"
+    ]
+  }
+}
