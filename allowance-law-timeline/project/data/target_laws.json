@@ -1,0 +1,91 @@
+[
+  {
+    "target_id": "jidou_teate_hou",
+    "law_name": "児童手当法",
+    "law_category": "law",
+    "ndl_law_id": "0000061613",
+    "hourei_ndl_url": "https://hourei.ndl.go.jp/#/detail?lawId=0000061613&searchDiv=1&current=5",
+    "simple_url": "https://hourei.ndl.go.jp/simple/detail?lawId=0000061613",
+    "focus_topics": [
+      "制度創設",
+      "支給対象",
+      "所得制限",
+      "支給額",
+      "子ども・子育て政策との関係"
+    ],
+    "collection_status": "not_started",
+    "notes": null
+  },
+  {
+    "target_id": "jidou_fuyou_teate_hou",
+    "law_name": "児童扶養手当法",
+    "law_category": "law",
+    "ndl_law_id": "0000053349",
+    "hourei_ndl_url": "https://hourei.ndl.go.jp/#/detail?lawId=0000053349&searchDiv=1&current=2",
+    "simple_url": "https://hourei.ndl.go.jp/simple/detail?lawId=0000053349",
+    "focus_topics": [
+      "制度創設",
+      "母子福祉・ひとり親支援",
+      "所得制限",
+      "一部支給停止",
+      "支給額",
+      "父子家庭への拡大",
+      "公的年金との併給調整"
+    ],
+    "collection_status": "not_started",
+    "notes": null
+  },
+  {
+    "target_id": "jidou_fuyou_teate_hou_sekourei",
+    "law_name": "児童扶養手当法施行令",
+    "law_category": "cabinet_order",
+    "ndl_law_id": "0000053370",
+    "hourei_ndl_url": "https://hourei.ndl.go.jp/#/detail?lawId=0000053370&searchDiv=1&current=22",
+    "simple_url": "https://hourei.ndl.go.jp/simple/detail?lawId=0000053370",
+    "focus_topics": [
+      "所得制限限度額",
+      "所得計算",
+      "扶養親族等の数",
+      "支給停止",
+      "認定・手続"
+    ],
+    "collection_status": "not_started",
+    "notes": null
+  },
+  {
+    "target_id": "tokubetsu_jidou_fuyou_teate_hou",
+    "law_name": "特別児童扶養手当等の支給に関する法律",
+    "law_category": "law",
+    "ndl_law_id": "0000055859",
+    "hourei_ndl_url": "https://hourei.ndl.go.jp/#/detail?lawId=0000055859&searchDiv=1&current=3",
+    "simple_url": "https://hourei.ndl.go.jp/simple/detail?lawId=0000055859",
+    "focus_topics": [
+      "制度創設",
+      "重度精神薄弱児扶養手当からの展開",
+      "対象児童",
+      "障害程度",
+      "所得制限",
+      "支給額",
+      "障害児福祉手当・特別障害者手当との関係"
+    ],
+    "collection_status": "not_started",
+    "notes": null
+  },
+  {
+    "target_id": "tokubetsu_jidou_fuyou_teate_hou_sekourei",
+    "law_name": "特別児童扶養手当等の支給に関する法律施行令",
+    "law_category": "cabinet_order",
+    "ndl_law_id": "0000065214",
+    "hourei_ndl_url": "https://hourei.ndl.go.jp/#/detail?lawId=0000065214&searchDiv=1&current=3",
+    "simple_url": "https://hourei.ndl.go.jp/simple/detail?lawId=0000065214",
+    "focus_topics": [
+      "所得制限限度額",
+      "所得計算",
+      "障害程度",
+      "支給停止",
+      "認定・手続"
+    ],
+    "collection_status": "not_started",
+    "notes": null
+  }
+]

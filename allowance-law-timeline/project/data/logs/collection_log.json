@@ -1,0 +1,72 @@
+[
+  {
+    "target_id": "jidou_teate_hou",
+    "law_id": "0000061613",
+    "checked_at_utc": "2026-04-29T13:50:30Z",
+    "normal_url": "https://hourei.ndl.go.jp/#/detail?lawId=0000061613&searchDiv=1&current=5",
+    "simple_url": "https://hourei.ndl.go.jp/simple/detail?lawId=0000061613",
+    "normal_status_code": null,
+    "normal_fetch_status": "failed",
+    "normal_saved_path": null,
+    "simple_status_code": null,
+    "simple_fetch_status": "failed",
+    "simple_saved_path": null,
+    "phase": "Phase 1"
+  },
+  {
+    "target_id": "jidou_fuyou_teate_hou",
+    "law_id": "0000053349",
+    "checked_at_utc": "2026-04-29T13:50:30Z",
+    "normal_url": "https://hourei.ndl.go.jp/#/detail?lawId=0000053349&searchDiv=1&current=2",
+    "simple_url": "https://hourei.ndl.go.jp/simple/detail?lawId=0000053349",
+    "normal_status_code": null,
+    "normal_fetch_status": "failed",
+    "normal_saved_path": null,
+    "simple_status_code": null,
+    "simple_fetch_status": "failed",
+    "simple_saved_path": null,
+    "phase": "Phase 1"
+  },
+  {
+    "target_id": "jidou_fuyou_teate_hou_sekourei",
+    "law_id": "0000053370",
+    "checked_at_utc": "2026-04-29T13:50:30Z",
+    "normal_url": "https://hourei.ndl.go.jp/#/detail?lawId=0000053370&searchDiv=1&current=22",
+    "simple_url": "https://hourei.ndl.go.jp/simple/detail?lawId=0000053370",
+    "normal_status_code": null,
+    "normal_fetch_status": "failed",
+    "normal_saved_path": null,
+    "simple_status_code": null,
+    "simple_fetch_status": "failed",
+    "simple_saved_path": null,
+    "phase": "Phase 1"
+  },
+  {
+    "target_id": "tokubetsu_jidou_fuyou_teate_hou",
+    "law_id": "0000055859",
+    "checked_at_utc": "2026-04-29T13:50:30Z",
+    "normal_url": "https://hourei.ndl.go.jp/#/detail?lawId=0000055859&searchDiv=1&current=3",
+    "simple_url": "https://hourei.ndl.go.jp/simple/detail?lawId=0000055859",
+    "normal_status_code": null,
+    "normal_fetch_status": "failed",
+    "normal_saved_path": null,
+    "simple_status_code": null,
+    "simple_fetch_status": "failed",
+    "simple_saved_path": null,
+    "phase": "Phase 1"
+  },
+  {
+    "target_id": "tokubetsu_jidou_fuyou_teate_hou_sekourei",
+    "law_id": "0000065214",
+    "checked_at_utc": "2026-04-29T13:50:30Z",
+    "normal_url": "https://hourei.ndl.go.jp/#/detail?lawId=0000065214&searchDiv=1&current=3",
+    "simple_url": "https://hourei.ndl.go.jp/simple/detail?lawId=0000065214",
+    "normal_status_code": null,
+    "normal_fetch_status": "failed",
+    "normal_saved_path": null,
+    "simple_status_code": null,
+    "simple_fetch_status": "failed",
+    "simple_saved_path": null,
+    "phase": "Phase 1"
+  }
+]
