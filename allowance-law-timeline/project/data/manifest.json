@@ -1,0 +1,24 @@
+{
+  "schema_version": "0.1.0",
+  "project_name": "児童関係手当制度 法改正・国会審議一次資料JSON化プロジェクト",
+  "purpose": "児童手当法、児童扶養手当法、特別児童扶養手当等の支給に関する法律および関連施行令について、法改正履歴と国会審議資料を一次資料ベースで構造化する。",
+  "created_by": "Codex",
+  "intended_reviewer": "ChatGPT 5.5",
+  "created_at": "2026-04-29",
+  "phase": "Phase 1",
+  "rules": {
+    "primary_sources_only": true,
+    "do_not_invent": true,
+    "unknown_values_as_null": true,
+    "raw_excerpt_required": true,
+    "url_required": true,
+    "separate_facts_from_interpretation": true
+  },
+  "target_files": [
+    "target_laws.json",
+    "amendments.json",
+    "source_events.json",
+    "extracted_change_claims.json",
+    "discussion_points.json"
+  ]
+}
