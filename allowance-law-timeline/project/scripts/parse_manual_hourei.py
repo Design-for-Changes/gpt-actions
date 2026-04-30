@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Parse manually saved NDL Hourei HTML files and build amendments draft.
+"""Parse manually saved NDL Hourei HTML files and build amendment events.
 
-This script intentionally creates a conservative draft with nulls for unknown fields.
-It does not fetch network resources.
+The script does not fetch network resources. It only reads files placed under
+project/data/manual_sources/hourei and leaves missing values as null.
 """
 
 from __future__ import annotations
@@ -17,15 +17,51 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
 MANUAL_DIR = DATA_DIR / "manual_sources" / "hourei"
 OUTPUT_PATH = DATA_DIR / "amendments_draft.json"
-UNRESOLVED_PATH = DATA_DIR / "logs" / "unresolved_items.json"
-PARSE_LOG_PATH = DATA_DIR / "logs" / "manual_parse_log.json"
+LOG_DIR = DATA_DIR / "logs"
+UNRESOLVED_PATH = LOG_DIR / "unresolved_items.json"
+PARSE_LOG_PATH = LOG_DIR / "manual_parse_log.json"
 
 TARGETS = [
-    ("jidou_teate_hou", "児童手当法", "0000061613", "jidou_teate_hou.html"),
-    ("jidou_fuyou_teate_hou", "児童扶養手当法", "0000053349", "jidou_fuyou_teate_hou.html"),
-    ("jidou_fuyou_teate_hou_sekourei", "児童扶養手当法施行令", "0000053370", "jidou_fuyou_teate_hou_sekourei.html"),
-    ("tokubetsu_jidou_fuyou_teate_hou", "特別児童扶養手当等の支給に関する法律", "0000055859", "tokubetsu_jidou_fuyou_teate_hou.html"),
-    ("tokubetsu_jidou_fuyou_teate_hou_sekourei", "特別児童扶養手当等の支給に関する法律施行令", "0000065214", "tokubetsu_jidou_fuyou_teate_hou_sekourei.html"),
+    {
+        "target_id": "jidou_teate_hou",
+        "benefit_id": "child_allowance",
+        "law_name": "児童手当法",
+        "law_id": "0000061613",
+        "source_kind": "法律",
+        "file_name": "jidou_teate_hou.html",
+    },
+    {
+        "target_id": "jidou_fuyou_teate_hou",
+        "benefit_id": "child_support",
+        "law_name": "児童扶養手当法",
+        "law_id": "0000053349",
+        "source_kind": "法律",
+        "file_name": "jidou_fuyou_teate_hou.html",
+    },
+    {
+        "target_id": "jidou_fuyou_teate_hou_sekourei",
+        "benefit_id": "child_support",
+        "law_name": "児童扶養手当法施行令",
+        "law_id": "0000053370",
+        "source_kind": "施行令",
+        "file_name": "jidou_fuyou_teate_hou_sekourei.html",
+    },
+    {
+        "target_id": "tokubetsu_jidou_fuyou_teate_hou",
+        "benefit_id": "special_child",
+        "law_name": "特別児童扶養手当等の支給に関する法律",
+        "law_id": "0000055859",
+        "source_kind": "法律",
+        "file_name": "tokubetsu_jidou_fuyou_teate_hou.html",
+    },
+    {
+        "target_id": "tokubetsu_jidou_fuyou_teate_hou_sekourei",
+        "benefit_id": "special_child",
+        "law_name": "特別児童扶養手当等の支給に関する法律施行令",
+        "law_id": "0000065214",
+        "source_kind": "施行令",
+        "file_name": "tokubetsu_jidou_fuyou_teate_hou_sekourei.html",
+    },
 ]
 
 ERA_BASE = {"明治": 1867, "大正": 1911, "昭和": 1925, "平成": 1988, "令和": 2018}
@@ -35,300 +71,224 @@ def now_utc() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
-def html_to_text(html: str) -> str:
-    text = re.sub(r"<script[\s\S]*?</script>", "", html, flags=re.I)
+def strip_tags(value: str) -> str:
+    text = re.sub(r"<script[\s\S]*?</script>", "", value, flags=re.I)
     text = re.sub(r"<style[\s\S]*?</style>", "", text, flags=re.I)
-    text = re.sub(r"<[^>]+>", "\n", text)
-    text = text.replace("\xa0", " ")
-    text = re.sub(r"\n{2,}", "\n", text)
-    return text
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = (
+        text.replace("&nbsp;", " ")
+        .replace("&#160;", " ")
+        .replace("&amp;", "&")
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", '"')
+        .replace("&#39;", "'")
+    )
+    return re.sub(r"\s+", " ", text).strip()
 
 
-def convert_jp_date_to_iso(date_text: str | None) -> str | None:
-    if not date_text:
+def parse_japanese_date(text: str | None) -> str | None:
+    if not text:
         return None
-    m = re.search(r"(明治|大正|昭和|平成|令和)(元|\d+)年(\d+)月(\d+)日", date_text)
-    if not m:
+    match = re.search(r"(明治|大正|昭和|平成|令和)(元|\d+)年(\d+)月(\d+)日", text)
+    if not match:
         return None
-    era, y, mo, d = m.groups()
-    year = 1 if y == "元" else int(y)
-    western = ERA_BASE[era] + year
-    return f"{western:04d}-{int(mo):02d}-{int(d):02d}"
+    era, year_text, month, day = match.groups()
+    era_year = 1 if year_text == "元" else int(year_text)
+    year = ERA_BASE[era] + era_year
+    return f"{year:04d}-{int(month):02d}-{int(day):02d}"
 
 
-def extract_law_id(line: str) -> str | None:
-    m = re.search(r"lawId=(\d{10})", line)
-    if m:
-        return m.group(1)
-    m = re.search(r"\b(\d{10})\b", line)
-    return m.group(1) if m else None
+def match_field(html: str, label: str) -> str | None:
+    match = re.search(rf"<span>\s*{re.escape(label)}：([\s\S]*?)</span>", html)
+    if not match:
+        return None
+    value = strip_tags(match.group(1))
+    return value or None
 
 
-def parse_history_line(target_id: str, line: str, idx: int) -> dict[str, Any]:
-    amendment_type = None
-    for t in ("改正", "廃止", "制定", "施行"):
-        if t in line:
-            amendment_type = t
-            break
-
-    date_m = re.search(r"((明治|大正|昭和|平成|令和)(元|\d+)年\d+月\d+日)", line)
-    promulgation_date_original = date_m.group(1) if date_m else None
-
-    law_number = None
-    num_m = re.search(r"((明治|大正|昭和|平成|令和)(元|\d+)年(?:法律|政令)第\d+号)", line)
-    if num_m:
-        law_number = num_m.group(1)
-
-    name = None
-    name_m = re.search(r"「([^」]+)」", line)
-    if name_m:
-        name = name_m.group(1)
-
-    law_id = extract_law_id(line)
-    law_url = f"https://hourei.ndl.go.jp/#/detail?lawId={law_id}" if law_id else None
-
-    era_year = None
-    kind_code = None
-    num = None
-    am = re.search(r"(昭和|平成|令和|大正|明治)(元|\d+)年(法律|政令)第(\d+)号", law_number or "")
-    if am:
-        era = am.group(1)
-        y = "1" if am.group(2) == "元" else am.group(2)
-        era_initial = {"明治": "M", "大正": "T", "昭和": "S", "平成": "H", "令和": "R"}[era]
-        era_year = f"{era_initial}{y}"
-        kind_code = "L" if am.group(3) == "法律" else "C"
-        num = am.group(4)
-
-    amendment_id = f"{target_id}__{era_year}_{kind_code}{num}" if era_year and kind_code and num else f"{target_id}__unparsed_{idx:04d}"
-
-    return {
-        "target_id": target_id,
-        "amendment_id": amendment_id,
-        "amendment_type": amendment_type,
-        "history_text_raw": line,
-        "amendment_law_name": name,
-        "amendment_law_number": law_number,
-        "amendment_law_id": law_id,
-        "amendment_hourei_ndl_url": law_url,
-        "promulgation_date_original": promulgation_date_original,
-        "promulgation_date_iso": convert_jp_date_to_iso(promulgation_date_original),
-        "history_note": None,
-        "extraction_status": "parsed_with_gaps",
-    }
+def split_law_number(text: str) -> tuple[str, str | None]:
+    match = re.match(r"^(.+?(?:法律|政令|勅令|府令|省令|規則)第\d+号)(?:〔(.+)〕)?$", text)
+    if not match:
+        return text.strip(), None
+    return match.group(1).strip(), match.group(2).strip() if match.group(2) else None
 
 
-def collect_history_candidates(text: str) -> list[str]:
-    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
-    out = []
-    for ln in lines:
-        if any(k in ln for k in ["改正", "廃止", "制定", "法律第", "政令第", "法令沿革"]):
-            out.append(ln)
-    return out
+def extract_history_items(html: str) -> list[str]:
+    section = re.search(r'<h2><a name="history"[\s\S]*?</section>', html)
+    if not section:
+        return []
+    return re.findall(r"<li>[\s\S]*?</li>", section.group(0))
 
 
-def main() -> None:
-    unresolved = []
-    parse_entries = []
-    amendments = []
-
-    for target_id, law_name, law_id, file_name in TARGETS:
-        file_path = MANUAL_DIR / file_name
-        entry = {
-            "timestamp_utc": now_utc(),
-            "target_id": target_id,
-            "law_name": law_name,
-            "law_id": law_id,
-            "source_file": str(file_path.relative_to(ROOT)),
-            "source_file_exists": file_path.exists(),
-            "history_line_candidates": 0,
-            "amendments_extracted": 0,
-            "status": None,
-            "notes": None,
-        }
-
-        if not file_path.exists():
-            entry["status"] = "manual_source_missing"
-            entry["notes"] = "Input HTML file is missing"
-            unresolved.append({
-                "item_id": f"unresolved_{len(unresolved)+1:03d}",
-                "related_target_id": target_id,
-                "related_amendment_id": None,
-                "problem_type": "manual_source_missing",
-                "source_url": f"https://hourei.ndl.go.jp/simple/detail?lawId={law_id}",
-                "description": f"Manual source file not found: {file_name}",
-                "next_action_suggestion": "指定URLをブラウザで開き、HTMLを保存して配置する。",
-                "severity": "high",
-            })
-            parse_entries.append(entry)
-            continue
-
-        raw = file_path.read_text(encoding="utf-8", errors="ignore")
-        text = html_to_text(raw)
-        candidates = collect_history_candidates(text)
-        entry["history_line_candidates"] = len(candidates)
-
-        extracted_count = 0
-        for i, line in enumerate(candidates, start=1):
-            item = parse_history_line(target_id, line, i)
-            amendments.append(item)
-            extracted_count += 1
-            if item["amendment_law_number"] is None and item["amendment_law_name"] is None:
-                unresolved.append({
-                    "item_id": f"unresolved_{len(unresolved)+1:03d}",
-                    "related_target_id": target_id,
-                    "related_amendment_id": item["amendment_id"],
-                    "problem_type": "history_line_unparsed",
-                    "source_url": f"file://{file_path}",
-                    "description": f"Could not parse key fields from history line: {line[:200]}",
-                    "next_action_suggestion": "手動確認で改正法名・法令番号を補う。",
-                    "severity": "medium",
-                })
-
-        entry["amendments_extracted"] = extracted_count
-        entry["status"] = "parsed" if extracted_count > 0 else "no_history_detected"
-        if extracted_count == 0:
-            unresolved.append({
-                "item_id": f"unresolved_{len(unresolved)+1:03d}",
-                "related_target_id": target_id,
-                "related_amendment_id": None,
-                "problem_type": "no_history_detected",
-                "source_url": f"file://{file_path}",
-                "description": "History candidates were not detected from source text.",
-                "next_action_suggestion": "保存形式を確認し、テキスト抽出方法を調整する。",
-                "severity": "medium",
-            })
-
-        parse_entries.append(entry)
-
-    OUTPUT_PATH.write_text(json.dumps({
-        "schema_version": "0.1.0",
-        "generated_at_utc": now_utc(),
-        "input_mode": "manual_saved_html",
-        "source_directory": str(MANUAL_DIR.relative_to(ROOT)),
-        "amendments": amendments,
-    }, ensure_ascii=False, indent=2), encoding="utf-8")
-
-    UNRESOLVED_PATH.write_text(json.dumps(unresolved, ensure_ascii=False, indent=2), encoding="utf-8")
-    PARSE_LOG_PATH.write_text(json.dumps(parse_entries, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"wrote: {OUTPUT_PATH}")
-    print(f"wrote: {UNRESOLVED_PATH}")
-    print(f"wrote: {PARSE_LOG_PATH}")
-
-TARGETS = [
-    {
-        "target_id": "jidou_teate_hou",
-        "law_name": "児童手当法",
-        "law_id": "0000061613",
-        "file_name": "jidou_teate_hou.html",
-    },
-    {
-        "target_id": "jidou_fuyou_teate_hou",
-        "law_name": "児童扶養手当法",
-        "law_id": "0000053349",
-        "file_name": "jidou_fuyou_teate_hou.html",
-    },
-    {
-        "target_id": "jidou_fuyou_teate_hou_sekourei",
-        "law_name": "児童扶養手当法施行令",
-        "law_id": "0000053370",
-        "file_name": "jidou_fuyou_teate_hou_sekourei.html",
-    },
-    {
-        "target_id": "tokubetsu_jidou_fuyou_teate_hou",
-        "law_name": "特別児童扶養手当等の支給に関する法律",
-        "law_id": "0000055859",
-        "file_name": "tokubetsu_jidou_fuyou_teate_hou.html",
-    },
-    {
-        "target_id": "tokubetsu_jidou_fuyou_teate_hou_sekourei",
-        "law_name": "特別児童扶養手当等の支給に関する法律施行令",
-        "law_id": "0000065214",
-        "file_name": "tokubetsu_jidou_fuyou_teate_hou_sekourei.html",
-    },
-]
-
-
-def strip_tags(text: str) -> str:
-    return re.sub(r"<[^>]+>", "", text)
-
-
-def extract_history_lines(html_text: str) -> list[str]:
-    plain = strip_tags(html_text)
-    lines = [line.strip() for line in plain.splitlines()]
-    history_like = []
-    for line in lines:
-        if not line:
-            continue
-        if any(key in line for key in ("改正", "廃止", "法令沿革", "法律第", "政令第")):
-            history_like.append(line)
-    return history_like
-
-
-def parse_target(target: dict[str, str]) -> dict[str, Any]:
-    path = MANUAL_DIR / target["file_name"]
-    if not path.exists():
-        return {
-            "target_id": target["target_id"],
-            "law_name": target["law_name"],
-            "ndl_law_id": target["law_id"],
-            "source_file": str(path.relative_to(ROOT)),
-            "source_file_exists": False,
-            "law_basic_info": {
-                "law_name_in_source": None,
-                "promulgation_info": None,
-                "enforcement_info": None,
-                "notes": None,
-            },
-            "history_candidates": [],
-            "collection_status": "manual_source_missing",
-            "verification_status": "unverified",
-            "notes": "manual source file not found",
-        }
-
-    html_text = path.read_text(encoding="utf-8", errors="ignore")
-    history_candidates = extract_history_lines(html_text)
-
-    return {
+def parse_target(target: dict[str, str]) -> tuple[list[dict[str, Any]], dict[str, Any], list[dict[str, Any]]]:
+    file_path = MANUAL_DIR / target["file_name"]
+    log_entry: dict[str, Any] = {
+        "timestamp_utc": now_utc(),
         "target_id": target["target_id"],
         "law_name": target["law_name"],
-        "ndl_law_id": target["law_id"],
-        "source_file": str(path.relative_to(ROOT)),
-        "source_file_exists": True,
-        "law_basic_info": {
-            "law_name_in_source": None,
-            "promulgation_info": None,
-            "enforcement_info": None,
-            "notes": None,
-        },
-        "history_candidates": [
-            {
-                "history_text_raw": line,
-                "amendment_law_name": None,
-                "amendment_law_number": None,
-                "amendment_law_id": None,
-                "amendment_hourei_ndl_url": None,
-                "amendment_type": None,
-                "note": None,
-                "verification_status": "unverified",
-            }
-            for line in history_candidates
-        ],
-        "collection_status": "draft_extracted",
-        "verification_status": "unverified",
+        "law_id": target["law_id"],
+        "source_file": str(file_path.relative_to(ROOT)),
+        "source_file_exists": file_path.exists(),
+        "history_items_detected": 0,
+        "events_extracted": 0,
+        "status": None,
         "notes": None,
     }
+    unresolved: list[dict[str, Any]] = []
+    events: list[dict[str, Any]] = []
+
+    if not file_path.exists():
+        log_entry["status"] = "manual_source_missing"
+        log_entry["notes"] = "Input HTML file is missing"
+        unresolved.append(
+            {
+                "related_target_id": target["target_id"],
+                "problem_type": "manual_source_missing",
+                "source_url": f"https://hourei.ndl.go.jp/simple/detail?lawId={target['law_id']}",
+                "description": f"Manual source file not found: {target['file_name']}",
+                "severity": "high",
+            }
+        )
+        return events, log_entry, unresolved
+
+    html = file_path.read_text(encoding="utf-8", errors="ignore")
+    source_law_name = strip_tags((re.search(r"<h1>([\s\S]*?)</h1>", html) or ["", target["law_name"]])[1])
+    law_number = match_field(html, "法律番号") or match_field(html, "政令番号")
+    promulgated_text = match_field(html, "公布年月日")
+    promulgated_date = parse_japanese_date(promulgated_text)
+    bill_name = match_field(html, "法律案名")
+    bill_session = match_field(html, "提出回次")
+    passed_date = parse_japanese_date(match_field(html, "成立年月日"))
+
+    if promulgated_date:
+        detail_parts = [
+            f"{law_number or '法令番号不明'}を公布。",
+            f"法案名：{bill_name}。" if bill_name else None,
+            f"提出回次：{bill_session}。" if bill_session else None,
+            f"成立日：{passed_date}。" if passed_date else None,
+        ]
+        events.append(
+            {
+                "target_id": target["target_id"],
+                "benefit_id": target["benefit_id"],
+                "event_id": f"{target['target_id']}__promulgated",
+                "event_type": "制定",
+                "source_kind": target["source_kind"],
+                "source": "日本法令索引",
+                "source_file": target["file_name"],
+                "source_law_name": source_law_name,
+                "amendment_law_name": source_law_name,
+                "amendment_law_number": law_number,
+                "amendment_law_id": target["law_id"],
+                "promulgation_date_original": promulgated_text,
+                "promulgation_date_iso": promulgated_date,
+                "title": f"制定：{source_law_name}",
+                "detail": " ".join(part for part in detail_parts if part),
+                "verification_status": "source_extracted",
+            }
+        )
+    else:
+        unresolved.append(
+            {
+                "related_target_id": target["target_id"],
+                "problem_type": "promulgation_date_unparsed",
+                "source_url": f"file://{file_path}",
+                "description": "Could not parse promulgation date from basic law information.",
+                "severity": "medium",
+            }
+        )
+
+    history_items = extract_history_items(html)
+    log_entry["history_items_detected"] = len(history_items)
+    for index, item in enumerate(history_items, start=1):
+        heading = strip_tags((re.search(r"<h3>([\s\S]*?)</h3>", item) or ["", ""])[1])
+        if not heading:
+            continue
+        event_type = (re.match(r"^([^：]+)：", heading) or ["", "沿革"])[1]
+        body = re.sub(r"^([^：]+)：\s*", "", heading)
+        date = parse_japanese_date(body)
+        number, note = split_law_number(body)
+        if not date:
+            unresolved.append(
+                {
+                    "related_target_id": target["target_id"],
+                    "problem_type": "history_date_unparsed",
+                    "source_url": f"file://{file_path}",
+                    "description": heading,
+                    "severity": "medium",
+                }
+            )
+            continue
+
+        events.append(
+            {
+                "target_id": target["target_id"],
+                "benefit_id": target["benefit_id"],
+                "event_id": f"{target['target_id']}__history_{index:03d}",
+                "event_type": event_type,
+                "source_kind": target["source_kind"],
+                "source": "日本法令索引",
+                "source_file": target["file_name"],
+                "source_law_name": source_law_name,
+                "amendment_law_name": None,
+                "amendment_law_number": number,
+                "amendment_law_id": None,
+                "promulgation_date_original": re.search(r"(明治|大正|昭和|平成|令和)(元|\d+)年\d+月\d+日", body).group(0),
+                "promulgation_date_iso": date,
+                "title": f"{event_type}：{number}",
+                "detail": note or f"{source_law_name}の{event_type}。",
+                "verification_status": "source_extracted",
+            }
+        )
+
+    log_entry["events_extracted"] = len(events)
+    log_entry["status"] = "parsed" if events else "no_events_detected"
+    return events, log_entry, unresolved
 
 
 def main() -> None:
-    result = {
-        "schema_version": "0.1.0",
-        "generated_by": "parse_manual_hourei.py",
-        "input_mode": "manual_saved_html",
-        "source_directory": str(MANUAL_DIR.relative_to(ROOT)),
-        "targets": [parse_target(t) for t in TARGETS],
-    }
-    OUTPUT_PATH.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"Wrote: {OUTPUT_PATH}")
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+    all_events: list[dict[str, Any]] = []
+    parse_log: list[dict[str, Any]] = []
+    unresolved: list[dict[str, Any]] = []
+
+    for target in TARGETS:
+        events, log_entry, target_unresolved = parse_target(target)
+        all_events.extend(events)
+        parse_log.append(log_entry)
+        unresolved.extend(target_unresolved)
+
+    all_events.sort(
+        key=lambda item: (
+            item.get("promulgation_date_iso") or "",
+            item.get("benefit_id") or "",
+            item.get("event_id") or "",
+        )
+    )
+    for index, item in enumerate(unresolved, start=1):
+        item["item_id"] = f"unresolved_{index:03d}"
+
+    OUTPUT_PATH.write_text(
+        json.dumps(
+            {
+                "schema_version": "0.2.0",
+                "generated_at_utc": now_utc(),
+                "input_mode": "manual_saved_html",
+                "source_directory": str(MANUAL_DIR.relative_to(ROOT)),
+                "count": len(all_events),
+                "amendments": all_events,
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    PARSE_LOG_PATH.write_text(json.dumps(parse_log, ensure_ascii=False, indent=2), encoding="utf-8")
+    UNRESOLVED_PATH.write_text(json.dumps(unresolved, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"wrote: {OUTPUT_PATH}")
+    print(f"events: {len(all_events)}")
+    print(f"unresolved: {len(unresolved)}")
 
 
 if __name__ == "__main__":

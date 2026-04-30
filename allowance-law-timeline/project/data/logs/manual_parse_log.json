@@ -1,62 +1,62 @@
 [
   {
-    "timestamp_utc": "2026-04-30T06:03:12Z",
+    "timestamp_utc": "2026-04-30T07:12:33Z",
     "target_id": "jidou_teate_hou",
     "law_name": "児童手当法",
     "law_id": "0000061613",
     "source_file": "data/manual_sources/hourei/jidou_teate_hou.html",
-    "source_file_exists": false,
-    "history_line_candidates": 0,
-    "amendments_extracted": 0,
-    "status": "manual_source_missing",
-    "notes": "Input HTML file is missing"
+    "source_file_exists": true,
+    "history_items_detected": 66,
+    "events_extracted": 67,
+    "status": "parsed",
+    "notes": null
   },
   {
-    "timestamp_utc": "2026-04-30T06:03:12Z",
+    "timestamp_utc": "2026-04-30T07:12:33Z",
     "target_id": "jidou_fuyou_teate_hou",
     "law_name": "児童扶養手当法",
     "law_id": "0000053349",
     "source_file": "data/manual_sources/hourei/jidou_fuyou_teate_hou.html",
-    "source_file_exists": false,
-    "history_line_candidates": 0,
-    "amendments_extracted": 0,
-    "status": "manual_source_missing",
-    "notes": "Input HTML file is missing"
+    "source_file_exists": true,
+    "history_items_detected": 86,
+    "events_extracted": 87,
+    "status": "parsed",
+    "notes": null
   },
   {
-    "timestamp_utc": "2026-04-30T06:03:12Z",
+    "timestamp_utc": "2026-04-30T07:12:33Z",
     "target_id": "jidou_fuyou_teate_hou_sekourei",
     "law_name": "児童扶養手当法施行令",
     "law_id": "0000053370",
     "source_file": "data/manual_sources/hourei/jidou_fuyou_teate_hou_sekourei.html",
-    "source_file_exists": false,
-    "history_line_candidates": 0,
-    "amendments_extracted": 0,
-    "status": "manual_source_missing",
-    "notes": "Input HTML file is missing"
+    "source_file_exists": true,
+    "history_items_detected": 104,
+    "events_extracted": 105,
+    "status": "parsed",
+    "notes": null
   },
   {
-    "timestamp_utc": "2026-04-30T06:03:12Z",
+    "timestamp_utc": "2026-04-30T07:12:33Z",
     "target_id": "tokubetsu_jidou_fuyou_teate_hou",
     "law_name": "特別児童扶養手当等の支給に関する法律",
     "law_id": "0000055859",
     "source_file": "data/manual_sources/hourei/tokubetsu_jidou_fuyou_teate_hou.html",
-    "source_file_exists": false,
-    "history_line_candidates": 0,
-    "amendments_extracted": 0,
-    "status": "manual_source_missing",
-    "notes": "Input HTML file is missing"
+    "source_file_exists": true,
+    "history_items_detected": 61,
+    "events_extracted": 62,
+    "status": "parsed",
+    "notes": null
   },
   {
-    "timestamp_utc": "2026-04-30T06:03:12Z",
+    "timestamp_utc": "2026-04-30T07:12:33Z",
     "target_id": "tokubetsu_jidou_fuyou_teate_hou_sekourei",
     "law_name": "特別児童扶養手当等の支給に関する法律施行令",
     "law_id": "0000065214",
     "source_file": "data/manual_sources/hourei/tokubetsu_jidou_fuyou_teate_hou_sekourei.html",
-    "source_file_exists": false,
-    "history_line_candidates": 0,
-    "amendments_extracted": 0,
-    "status": "manual_source_missing",
-    "notes": "Input HTML file is missing"
+    "source_file_exists": true,
+    "history_items_detected": 98,
+    "events_extracted": 99,
+    "status": "parsed",
+    "notes": null
   }
 ]
